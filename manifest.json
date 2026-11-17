@@ -1,0 +1,13 @@
+
+{
+  "manifest_version": 3,
+  "name": "Improved Scam Website Detector",
+  "version": "2.0",
+  "description": "Detects potentially suspicious website URLs",
+  "action": {
+    "default_popup": "popup.html"
+  },
+  "host_permissions": [
+    "http://127.0.0.1:5000/*"
+  ]
+}

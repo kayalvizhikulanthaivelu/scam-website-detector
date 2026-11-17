@@ -1,0 +1,297 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ScamGuard - Website Detection</title>
+
+<style>
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    background: #f1f5f9;
+    color: #1e293b;
+}
+
+header {
+    background: #101d35;
+    color: white;
+    padding: 22px 8%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+header h2 {
+    color: #38bdf8;
+}
+
+header span {
+    font-size: 14px;
+    color: #cbd5e1;
+}
+
+.container {
+    max-width: 850px;
+    margin: 65px auto;
+    padding: 20px;
+    text-align: center;
+}
+
+.tag {
+    color: #0284c7;
+    font-weight: bold;
+    margin-bottom: 18px;
+}
+
+h1 {
+    font-size: 38px;
+    margin-bottom: 15px;
+}
+
+.description {
+    color: #64748b;
+    line-height: 1.6;
+    margin-bottom: 35px;
+}
+
+.scanner {
+    background: white;
+    padding: 35px;
+    border-radius: 15px;
+    box-shadow: 0 5px 25px #00000010;
+}
+
+input {
+    width: 100%;
+    padding: 16px;
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    font-size: 15px;
+    margin-bottom: 18px;
+}
+
+button {
+    width: 100%;
+    padding: 16px;
+    background: #0284c7;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+button:hover {
+    background: #0369a1;
+}
+
+button:disabled {
+    opacity: 0.6;
+    cursor: wait;
+}
+
+#result {
+    margin-top: 25px;
+    padding: 20px;
+    border-radius: 10px;
+    display: none;
+    line-height: 1.7;
+}
+
+.safe {
+    display: block !important;
+    background: #dcfce7;
+    color: #166534;
+    border: 1px solid #86efac;
+}
+
+.scam {
+    display: block !important;
+    background: #fee2e2;
+    color: #991b1b;
+    border: 1px solid #fca5a5;
+}
+
+.error {
+    display: block !important;
+    background: #fff7ed;
+    color: #9a3412;
+    border: 1px solid #fed7aa;
+}
+
+.features {
+    display: flex;
+    justify-content: space-around;
+    gap: 15px;
+    margin-top: 35px;
+    flex-wrap: wrap;
+}
+
+.feature {
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    flex: 1;
+    min-width: 180px;
+}
+
+.feature h3 {
+    color: #0284c7;
+    margin-bottom: 8px;
+}
+
+footer {
+    text-align: center;
+    padding: 25px;
+    color: #64748b;
+}
+
+@media(max-width: 600px) {
+    h1 { font-size: 28px; }
+    .scanner { padding: 22px; }
+}
+</style>
+</head>
+
+<body>
+
+<header>
+    <h2>🛡 ScamGuard</h2>
+    <span>AI Website Protection</span>
+</header>
+
+<div class="container">
+
+    <p class="tag">MACHINE LEARNING BASED SECURITY</p>
+
+    <h1>Scam Website Detection</h1>
+
+    <p class="description">
+        Protect yourself from suspicious websites.
+        Enter a website URL and check its predicted security status
+        using our Machine Learning model.
+    </p>
+
+    <div class="scanner">
+
+        <input
+            type="text"
+            id="urlInput"
+            placeholder="Enter website URL (https://example.com)"
+        >
+
+        <button id="checkButton" onclick="checkWebsite()">
+            🔍 Check Website
+        </button>
+
+        <div id="result"></div>
+
+    </div>
+
+    <div class="features">
+
+        <div class="feature">
+            <h3>🔒 Security</h3>
+            <p>URL feature analysis</p>
+        </div>
+
+        <div class="feature">
+            <h3>🤖 Machine Learning</h3>
+            <p>Random Forest prediction</p>
+        </div>
+
+        <div class="feature">
+            <h3>⚡ Quick Check</h3>
+            <p>Instant prediction result</p>
+        </div>
+
+    </div>
+
+</div>
+
+<footer>
+    <p>ScamGuard | Mini Project - Cyber Security</p>
+    <p>ML-based predictions are not a guarantee of website safety.</p>
+</footer>
+
+<script>
+
+async function checkWebsite() {
+
+    const url = document.getElementById("urlInput").value.trim();
+    const result = document.getElementById("result");
+    const button = document.getElementById("checkButton");
+
+    result.style.display = "none";
+    result.className = "";
+
+    if (!url) {
+        result.className = "error";
+        result.innerHTML = "Please enter a website URL.";
+        return;
+    }
+
+    button.disabled = true;
+    button.innerText = "Checking...";
+    
+    try {
+
+        const response = await fetch("http://127.0.0.1:5000/check", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({url: url})
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            throw new Error(data.error || "Unable to check URL");
+        }
+
+        if (data.result === "SAFE") {
+
+            result.className = "safe";
+            result.innerHTML =
+                "<h2>✅ SAFE WEBSITE</h2>" +
+                "<p>Our ML model predicts this URL as SAFE.</p>" +
+                "<small>Prediction is not a guarantee of safety.</small>";
+
+        } else {
+
+            result.className = "scam";
+            result.innerHTML =
+                "<h2>⚠ SCAM WEBSITE DETECTED</h2>" +
+                "<p>Our ML model predicts this URL as suspicious.</p>" +
+                "<small>Avoid entering personal information.</small>";
+
+        }
+
+    } catch (error) {
+
+        result.className = "error";
+        result.innerHTML =
+            "<h3>Connection Error</h3><p>" +
+            error.message +
+            "</p><p>Make sure Flask backend is running.</p>";
+
+    }
+
+    button.disabled = false;
+    button.innerText = "🔍 Check Website";
+
+}
+
+</script>
+
+</body>
+</html>
